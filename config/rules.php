@@ -1,0 +1,5 @@
+<?php
+
+// Route rules
+return [
+];
