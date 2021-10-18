@@ -1,7 +1,7 @@
 <?php
 
-defined('YII_DEBUG') or define('YII_DEBUG', getenv('YII_DEBUG') ?: true);
-defined('YII_ENV') or define('YII_ENV', getenv('YII_ENV') ?: 'dev');
+defined('YII_DEBUG') or define('YII_DEBUG', getenv('YII_DEBUG') ?: false);
+defined('YII_ENV') or define('YII_ENV', getenv('YII_ENV') ?: 'prod');
 
 $baseDir = dirname(__DIR__) . DIRECTORY_SEPARATOR;
 /** @var Composer\Autoload\ClassLoader $composerAutoload */

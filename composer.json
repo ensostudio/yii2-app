@@ -35,9 +35,7 @@
         "psr-4": {
             "app\\": "src/"
         },
-        "files": [
-            "vendor/yiisoft/yii2/Yii.php"
-        ]
+        "classmap": ["vendor/yiisoft/yii2/Yii.php"]
     },
     "autoload-dev": {
         "psr-4": {
@@ -45,7 +43,10 @@
         }
     },
     "config": {
-        "process-timeout": 1800,
+        "optimize-autoloader": true,
+        "platform-check": true,
+        "use-include-path": true,
+        "process-timeout": 600,
         "fxp-asset": {
             "enabled": false
         }
@@ -78,8 +79,8 @@
         }
     },
     "replace": {
-        "npm-asset/bootstrap": ">=5.1",
-        "bower-asset/bootstrap": ">=5.1"
+        "npm-asset/bootstrap": "^5.1",
+        "bower-asset/bootstrap": "^5.1"
     },
     "repositories": [
         {

@@ -24,7 +24,7 @@ class SandboxController extends Controller
     public function actionIndex(string $message = 'default value'): int
     {
         echo $message . "\n";
-
+        echo YII_ENV . "\n";
         return ExitCode::OK;
     }
 }
