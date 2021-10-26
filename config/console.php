@@ -1,70 +1,96 @@
 <?php
 
-$baseDir = dirname(__DIR__);
 $config = [
     'id' => 'console',
     'name' => 'Yii2 CLI application',
     'language' => 'en-US',
-    'basePath' => $baseDir,
+    'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'app\commands',
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
-        '@tests' => '@app/tests',
-        '@app/controllers' => '@app/src/controllers',
+        '@app/commands' => '@app/src/commands',
+        '@app/migrations' => '@app/src/migrations',
     ],
+    'params' => require __DIR__ . '/params.php',
     'components' => [
+        'db' => require __DIR__ . '/db.php',
         'cache' => [
-            'class' => yii\caching\FileCache::class,
+            'class' => \yii\caching\FileCache::class,
         ],
         'mailer' => [
-            'class' => yii\swiftmailer\Mailer::class,
+            'class' => \yii\swiftmailer\Mailer::class,
             'useFileTransport' => YII_ENV_DEV,
             'enableSwiftMailerLogging' => YII_DEBUG,
-            'transport' => [
-                'class' => Swift_SmtpTransport::class,
-                // @todo configure SMTP
-                'host' => 'localhost',
-                // 'username' => 'username',
-                // 'password' => 'password',
-                // 'port' => 25,
-                // 'encryption' => 'tls',
-                'plugins' => [
-                    // ['class' => Swift_Plugins_ThrottlerPlugin::class, 'constructArgs' => [20]],
-                ]
-            ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => yii\log\FileTarget::class,
-                    'levels' => YII_DEBUG ? ['error', 'warning', 'info', 'trace'] : ['error', 'warning'],
+                    'class' => \yii\log\FileTarget::class,
+                    'levels' => YII_DEBUG ? ['error', 'warning', 'info'] : ['error', 'warning'],
                 ],
             ],
         ],
-        'db' => require __DIR__ . '/db.php',
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => require __DIR__ . '/rules.php',
+            'rules' => require __DIR__ . '/routes.php',
+        ],
+        'authManager' => [
+            'class' => \yii\rbac\DbManager::class,
+        ],
+        'i18n' => [
+            'translations' => [
+                'app/*' => [
+                    'class' => \yii\i18n\PhpMessageSource::class,
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                ],
+            ],
         ],
     ],
-    'params' => require __DIR__ . '/params.php',
-    'modules' => [],
     'controllerMap' => [
+        // @see https://github.com/fzaninotto/Faker
         'fixture' => [
-            'class' => yii\faker\FixtureController::class,
+            'class' => \yii\faker\FixtureController::class,
+            'language' => 'ru_RU',
         ],
+        'migrate-ns' => [
+            'class' => \yii\console\controllers\MigrateController::class,
+            'templateFile' => '@app/views/migrations/migration.php',
+            'generatorTemplateFiles' => [
+                'create_table' => '@app/views/migrations/createTable.php',
+                'add_column' => '@app/views/migrations/addColumn.php',
+            ],
+            'migrationPath' => null,
+            'migrationNamespaces' => ['app\migrations'],
+        ],
+        'migrate' => [
+            'class' => \yii\console\controllers\MigrateController::class,
+            'templateFile' => '@app/views/migrations/migration.php',
+            'generatorTemplateFiles' => [
+                'create_table' => '@app/views/migrations/createTable.php',
+                'add_column' => '@app/views/migrations/addColumn.php',
+            ],
+            'migrationPath' =>  [
+                //'@yii/caching/migrations',
+                //'@yii/i18n/migrations',
+                //'@yii/log/migrations',
+                '@yii/rbac/migrations',
+                '@yii/web/migrations',
+            ]
+        ]
     ],
+    'modules' => require __DIR__ . '/modules.php',
 ];
 
+// configuration adjustments for development environment
 if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => yii\gii\Module::class,
+        'class' => \yii\gii\Module::class,
     ];
 }
 

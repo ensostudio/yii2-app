@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'class' => yii\db\Connection::class,
+    'class' => \yii\db\Connection::class,
     // @todo set database settings
-    'dsn' => 'mysql:host=127.0.0.1:3306;dbname=yii',
+    'dsn' => 'mysql:host=127.0.0.1:3306;dbname=yii2',
     'username' => 'root',
     'password' => 'root',
     'charset' => 'utf8',

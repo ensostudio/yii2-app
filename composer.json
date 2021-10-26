@@ -11,7 +11,7 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.3",
+        "php": "^7.3 || ^8.0",
         "symfony/polyfill": "^1.23",
         "yiisoft/yii2": "^2.0",
         "yiisoft/yii2-bootstrap5": "^2.0",
@@ -33,9 +33,8 @@
     },
     "autoload": {
         "psr-4": {
-            "app\\": "src/"
-        },
-        "classmap": ["vendor/yiisoft/yii2/Yii.php"]
+            "app\\": ["src/", "modules/"]
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -44,8 +43,6 @@
     },
     "config": {
         "optimize-autoloader": true,
-        "platform-check": true,
-        "use-include-path": true,
         "process-timeout": 600,
         "fxp-asset": {
             "enabled": false
@@ -67,7 +64,7 @@
                     "runtime": "0775",
                     "tests/_data": "0775",
                     "tests/_output": "0755",
-                    "web/assets": "0755",
+                    "public/assets": "0755",
                     "yii": "0775"
                 }
             ]
@@ -77,10 +74,6 @@
                 "config/web.php"
             ]
         }
-    },
-    "replace": {
-        "npm-asset/bootstrap": "^5.1",
-        "bower-asset/bootstrap": "^5.1"
     },
     "repositories": [
         {

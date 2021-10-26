@@ -20,20 +20,20 @@ AppAsset::register($this);
 <head>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <?php $this->registerCsrfMetaTags() ?>
+    <?= $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+    <?= $this->head() ?>
 </head>
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
 
     <header>
-        <?php
+    <?php
         NavBar::begin([
             'brandLabel' => Yii::$app->name,
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
-                'class' => 'navbar navbar-expand-md navbar-dark bg-dark fixed-top',
+                'class' => 'navbar navbar-expand-md navbar-dark bg-dark sticky-top',
             ],
         ]);
         echo Nav::widget([
@@ -57,7 +57,7 @@ AppAsset::register($this);
             ],
         ]);
         NavBar::end();
-        ?>
+    ?>
     </header>
 
     <main role="main" class="flex-shrink-0 mt-auto">
@@ -68,7 +68,7 @@ AppAsset::register($this);
         </div>
     </main>
 
-    <footer class="footer mt-auto bg-light bg-gradient">
+    <footer class="footer mt-auto bg-light bg-gradient-light">
         <div class="container py-3">
             <div class="col-md-6 offset-md-3">
                 <div class="text-muted text-center">&copy; <?= Yii::$app->name ?> <?= date('Y') ?></div>

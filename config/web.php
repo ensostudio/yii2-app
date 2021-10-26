@@ -11,45 +11,43 @@ $config = [
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm' => '@vendor/npm-asset'
+        '@npm' => '@vendor/npm-asset',
+        '@app/controllers' => '@app/src/controllers',
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'k2aVT7nIv4QOrfhMY5yFu5c2h5NFWgxY',
         ],
         'cache' => [
-            'class' => yii\caching\FileCache::class,
+            'class' => \yii\caching\FileCache::class,
         ],
         'user' => [
-            'identityClass' => app\models\User::class,
+            'identityClass' => \app\models\User::class,
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
         'mailer' => [
-            'class' => yii\swiftmailer\Mailer::class,
+            'class' => \yii\swiftmailer\Mailer::class,
             'useFileTransport' => YII_ENV_DEV,
             'enableSwiftMailerLogging' => YII_DEBUG,
             'transport' => [
-                'class' => Swift_SmtpTransport::class,
+                'class' => \Swift_SmtpTransport::class,
                 // @todo configure SMTP
                 'host' => 'localhost',
                 // 'username' => 'username',
                 // 'password' => 'password',
                 // 'port' => 25,
                 // 'encryption' => 'tls',
-                'plugins' => [
-                    // ['class' => Swift_Plugins_ThrottlerPlugin::class, 'constructArgs' => [20]],
-                ]
+                'plugins' => []
             ],
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => yii\log\FileTarget::class,
+                    'class' => \yii\log\FileTarget::class,
                     'levels' => YII_DEBUG ? ['error', 'warning', 'info', 'trace'] : ['error', 'warning'],
                 ],
             ],
@@ -60,25 +58,46 @@ $config = [
             'showScriptName' => false,
             'rules' => require __DIR__ . '/rules.php',
         ],
+        'assetManager' => [
+            // override bundles to use local project files :
+            'bundles' => [
+                \yii\bootstrap5\BootstrapAsset::class => [
+                    'sourcePath' => '@app/assets/node_modules/bootstrap/dist',
+                    'css' => [
+                        YII_DEBUG ? 'css/bootstrap.css' : 'css/bootstrap.min.css',
+                    ],
+                ],
+                \yii\bootstrap5\BootstrapPluginAsset::class => [
+                    'sourcePath' => '@app/assets/node_modules/bootstrap/dist',
+                    'js' => [
+                        YII_DEBUG ? 'js/bootstrap.js' : 'js/bootstrap.min.js',
+                    ]
+                ],
+            ],
+        ],
     ],
     'params' => require __DIR__ . '/params.php',
     'modules' => [],
+    'controllerMap' => [],
 ];
 
+// configuration adjustments for development environment
 if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
-        'class' => yii\debug\Module::class,
+        'class' => \yii\debug\Module::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => yii\gii\Module::class,
+        'class' => \yii\gii\Module::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
+        'generators' => [
+             'module' => ['class' => \app\gii\generators\module\ModuleGenerator::class]
+        ]
     ];
 }
 

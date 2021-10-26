@@ -1,8 +1,7 @@
 <?php
 
 return [
-    'adminEmail' => 'admin@example.com',
-    'senderEmail' => 'noreply@example.com',
-    'senderName' => 'Example.com mailer',
-    'languages' => ['en', 'ru'],
+    'adminEmail' => 'admin@yii2.test',
+    'senderEmail' => 'info@yii2.test',
+    'senderName' => 'Yii2 tester',
 ];
