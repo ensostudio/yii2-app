@@ -31,8 +31,7 @@ class <?= $className ?> extends Migration
      */
     public function safeUp(): bool
     {
-<?= $this->render('@yii/views/_createTable', compact('table', 'fields', 'foreignKeys')) ?>
-
+<?= $this->render('_createTable', compact('table', 'fields', 'foreignKeys')) ?>
 <?php if (!empty($tableComment)) {
     echo $this->render('@yii/views/_addComments', ['table' => $table, 'tableComment' => trim($tableComment, '"\' ')]);
 }

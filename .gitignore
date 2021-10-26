@@ -23,3 +23,5 @@ Thumbs.db
 /*.cache
 /*.tmp
 /*.phar
+# todo: убрать migrations
+/src/migrations/*

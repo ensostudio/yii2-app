@@ -1,12 +1,10 @@
 <?php
 
-$baseDir = dirname(__DIR__);
-
 $config = [
     'id' => 'web',
     'name' => 'Yii2 application',
     'language' => 'en-US',
-    'basePath' => $baseDir,
+    'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'app\controllers',
     'bootstrap' => ['log'],
     'aliases' => [
@@ -56,7 +54,7 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => require __DIR__ . '/rules.php',
+            'rules' => require __DIR__ . '/routes.php',
         ],
         'assetManager' => [
             // override bundles to use local project files :
@@ -77,7 +75,7 @@ $config = [
         ],
     ],
     'params' => require __DIR__ . '/params.php',
-    'modules' => [],
+    'modules' => require __DIR__ . '/modules.php',
     'controllerMap' => [],
 ];
 
@@ -87,17 +85,15 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => \yii\debug\Module::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        // 'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => \yii\gii\Module::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
-        'generators' => [
-             'module' => ['class' => \app\gii\generators\module\ModuleGenerator::class]
-        ]
+        // 'allowedIPs' => ['127.0.0.1', '::1'],
+        // 'generators' => []
     ];
 }
 
