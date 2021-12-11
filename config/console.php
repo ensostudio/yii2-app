@@ -17,10 +17,10 @@ $config = [
     'components' => [
         'db' => require __DIR__ . '/db.php',
         'cache' => [
-            'class' => \yii\caching\FileCache::class,
+            'class' => yii\caching\FileCache::class,
         ],
         'mailer' => [
-            'class' => \yii\swiftmailer\Mailer::class,
+            'class' => yii\swiftmailer\Mailer::class,
             'useFileTransport' => YII_ENV_DEV,
             'enableSwiftMailerLogging' => YII_DEBUG,
         ],
@@ -28,7 +28,7 @@ $config = [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => \yii\log\FileTarget::class,
+                    'class' => yii\log\FileTarget::class,
                     'levels' => YII_DEBUG ? ['error', 'warning', 'info'] : ['error', 'warning'],
                 ],
             ],
@@ -39,12 +39,12 @@ $config = [
             'rules' => require __DIR__ . '/routes.php',
         ],
         'authManager' => [
-            'class' => \yii\rbac\DbManager::class,
+            'class' => yii\rbac\DbManager::class,
         ],
         'i18n' => [
             'translations' => [
                 'app/*' => [
-                    'class' => \yii\i18n\PhpMessageSource::class,
+                    'class' => yii\i18n\PhpMessageSource::class,
                     'basePath' => '@app/messages',
                     'sourceLanguage' => 'en-US',
                 ],
@@ -54,11 +54,11 @@ $config = [
     'controllerMap' => [
         // @see https://github.com/fzaninotto/Faker
         'fixture' => [
-            'class' => \yii\faker\FixtureController::class,
+            'class' => yii\faker\FixtureController::class,
             'language' => 'ru_RU',
         ],
         'migrate-ns' => [
-            'class' => \yii\console\controllers\MigrateController::class,
+            'class' => yii\console\controllers\MigrateController::class,
             'templateFile' => '@app/views/migrations/migration.php',
             'generatorTemplateFiles' => [
                 'create_table' => '@app/views/migrations/createTable.php',
@@ -68,18 +68,18 @@ $config = [
             'migrationNamespaces' => ['app\migrations'],
         ],
         'migrate' => [
-            'class' => \yii\console\controllers\MigrateController::class,
+            'class' => yii\console\controllers\MigrateController::class,
             'templateFile' => '@app/views/migrations/migration.php',
             'generatorTemplateFiles' => [
                 'create_table' => '@app/views/migrations/createTable.php',
                 'add_column' => '@app/views/migrations/addColumn.php',
             ],
             'migrationPath' =>  [
-                //'@yii/caching/migrations',
-                //'@yii/i18n/migrations',
-                //'@yii/log/migrations',
                 '@yii/rbac/migrations',
                 '@yii/web/migrations',
+                '@yii/caching/migrations',
+                '@yii/i18n/migrations',
+                '@yii/log/migrations',
             ]
         ]
     ],
@@ -90,7 +90,7 @@ $config = [
 if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => \yii\gii\Module::class,
+        'class' => yii\gii\Module::class,
     ];
 }
 

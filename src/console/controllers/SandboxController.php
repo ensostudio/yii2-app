@@ -1,6 +1,6 @@
 <?php
 
-namespace app\commands;
+namespace app\console\controllers;
 
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -23,8 +23,7 @@ class SandboxController extends Controller
      */
     public function actionIndex(string $message = 'default value'): int
     {
-        echo $message . "\n";
-        echo YII_ENV . "\n";
+        $this->strout($message . PHP_EOL . YII_ENV);
         return ExitCode::OK;
     }
 }

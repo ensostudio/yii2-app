@@ -2,88 +2,62 @@
 
 namespace app\reflection;
 
-use app\tokenizer\Token;
 use SplFileInfo;
 use ReflectionClass;
-use ReflectionException;
-use function array_slice;
-use function file;
-use function file_get_contents;
 
 /**
- * Extended reflection class.
+ * Extended class reflection.
  *
  * @property-read \ReflectionMethod[] $methods
  * @property-read \ReflectionProperty[] $properties
- * @property-read \ReflectionClassConstant[] $constants
+ * @property-read array $defaultProperties The default properties
+ * @property-read \ReflectionClassConstant[] $reflectionConstants
+ * @property-read array $constants An array of class constants as constant name/value pairs
+ * @property-read \app\tokenizer\Token[]|false $tokens
+ * @property-read ReflectionClass[] $traits
+ * @property-read ReflectionClass[] $interfaces
+ * @property-read int $modifiers The bitmask of modifier constants
+ * @property-read string|false $docComment
  * @property-read string|false $fileName
  * @property-read SplFileInfo|false $fileInfo
+ * @property-read string $namespaceName
+ * @property-read string|false $parentClass
  */
 class ClassReflection extends ReflectionClass
 {
-    /**
-     * @var SplFileInfo|false Information for class file
-     */
-    private $fileInfo;
+    use ReflectionTrait;
 
     /**
-     * @param string $name
-     * @return mixed
-     * @throws ReflectionException
-     */
-    public function __get(string $name)
-    {
-        $method = 'get' . ucfirst($name);
-        if (!method_exists($this, $method)) {
-            throw new ReflectionException("Property '$name' not defined");
-        }
-        return $this->{$method}();
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function __isset(string $name): bool
-    {
-        return method_exists($this, 'get' . ucfirst($name));
-    }
-
-    /**
-     * Returns class source into PHP tokens.
+     * Returns methods declared in reflected class.
      *
-     * @param bool $classOnly If true, method return "... class ... {}" tokens, else, return all tokens in file
-     * @return Token[]|false
+     * @param int $flags The bitmask of attribute constants
+     * @return array
      */
-    public function getTokens(bool $classOnly = true)
+    public function getDeclaredMethods(int $flags = 0): array
     {
-        if ($this->getFileName() === false) {
-            return false;
+        $methods = [];
+        foreach ($this->getMethods($flags) as $method) {
+            if ($method->getDeclaringClass() === $this->name) {
+                $methods[$method->name] = $method;
+            }
         }
-
-        if ($classOnly) {
-            $code = file($this->getFileName());
-            $code = array_slice($code, $this->getStartLine(), $this->getEndLine() - $this->getStartLine());
-            $tokens = Token::tokenize("<?php\n" . implode('', $code));
-            // remove "<?php\n"
-            $tokens = array_slice($tokens, 2);
-        } else {
-            $tokens = Token::tokenize(file_get_contents($this->getFileName()));
-        }
-
-        return $tokens;
+        return $methods;
     }
 
     /**
-     * @return SplFileInfo|false
+     * Returns properties declared in reflected class.
+     *
+     * @param int $flags The bitmask of attribute constants
+     * @return array
      */
-    public function getFileInfo()
+    public function getDeclaredProperties(int $flags = 0): array
     {
-        if ($this->fileInfo === null) {
-            $file = $this->getFileName();
-            $this->fileInfo = $file !== false ? new SplFileInfo($file) : false;
+        $properties = [];
+        foreach ($this->getProperties($flags) as $property) {
+            if ($property->getDeclaringClass() === $this->name) {
+                $properties[$property->name] = $property;
+            }
         }
-
-        return $this->fileInfo;
+        return $properties;
     }
 }

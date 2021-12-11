@@ -1,9 +1,8 @@
 <?php
-
 /**
  * Creates a call for the method `yii\db\Migration::createTable()`.
  *
- * @var \yii\web\View $this
+ * @var yii\web\View $this
  * @var string $table the name table
  * @var array $fields the fields
  * @var array $foreignKeys the foreign keys
@@ -17,4 +16,4 @@
 <?php endforeach; ?>
             ]
         );
-<?= $this->render('_addForeignKeys', compact('table', 'foreignKeys')) ?>
+        <?= $this->render('_addForeignKeys', compact('table', 'foreignKeys')) ?>

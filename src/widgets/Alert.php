@@ -29,10 +29,10 @@ class Alert extends bootstrap5\Widget
 {
     /**
      * @var array the alert types configuration for the flash messages. This array is setup as `$key => $value`, where:
-     *      - key: the name of the session flash variable
-     *      - value: the bootstrap alert type (i.e. danger, success, info, warning)
+     * - key: the name of the session flash variable
+     * - value: the bootstrap alert type (i.e. danger, success, info, warning)
      */
-    public array $alertTypes = [
+    public $alertTypes = [
         'error'   => 'alert-danger',
         'danger'  => 'alert-danger',
         'success' => 'alert-success',
@@ -42,13 +42,13 @@ class Alert extends bootstrap5\Widget
     /**
      * @var array the options for rendering the close button tag.
      */
-    public array $closeButton = [];
+    public $closeButton = [];
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      * @throws \Exception Rendering error
      */
-    public function run(): string
+    public function run()
     {
         if (!Yii::$app->session->hasSessionId) {
             return '';
@@ -67,10 +67,7 @@ class Alert extends bootstrap5\Widget
                     'closeButton' => $this->closeButton,
                     'options' => array_merge(
                         $this->options,
-                        [
-                            'id' => $idPrefix . $i,
-                            'class' => $this->alertTypes[$type] . $appendClass,
-                        ]
+                        ['id' => $idPrefix . $i, 'class' => $this->alertTypes[$type] . $appendClass]
                     ),
                 ]) . PHP_EOL;
             }

@@ -1,6 +1,6 @@
 <?php
 
-namespace app;
+namespace EnsoStudio\Yii2App;
 
 use ReflectionClass;
 use Yii;
@@ -8,51 +8,104 @@ use Yii;
 /**
  * Application module.
  *
- * @inheritdoc
- * @property-read string $i18nPath the root directory of module translations
- * @property-read string $i18nCategory the category of module translations
- * @property-read string $baseAlias the alias for base directory of this module
+ * @inheritDoc
+ * @property-read string $sourcePath The base directory of sources
+ * @property-read string $i18nPath The base directory of translations
+ * @property string $controllerPath The base directory of controllers
  */
 abstract class Module extends \yii\base\Module
 {
     /**
+     * Module sub-directory with PHP sources(classes and interfaces).
+     */
+    const SOURCE_DIR = 'src';
+    /**
+     * Module sub-directory with message translations.
+     */
+    const I18N_DIR = 'messages';
+
+    /**
+     * @event Event an event raised at module initializion.
+     */
+    const EVENT_INIT = 'init';
+
+    /**
+     * @var string the base namespace of module classes
+     */
+    private $baseNamespace;
+    /**
      * @var string the unique identifier of this module
      */
-    protected $uniqueId;
+    private $uniqueId;
     /**
      * @var string the root directory of module controllers
      */
-    protected $controllerPath;
-    /**
-     * @var string the  module reflection instance
-     */
-    protected $i18nCategory;
+    private $controllerPath;
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function init()
+    public function __construct($id, $parent = null, array $config = [])
     {
-        if ($this->controllerNamespace === null) {
-            $this->controllerNamespace = $this->getReflection()->getNamespaceName() . '\\'
-                . (Yii::$app instanceof \yii\web\Application ? 'controllers' : 'commands');
+        if (empty($config['baseNamespace']) || empty($config['basePath'])) {
+            $class = new ReflectionClass($this);
         }
-        // Moved down to skip auto set namespace
-        parent::init();
-        // Add the alias for base directory of this module
-        Yii::setAlias($this->getBaseAlias(), $this->getBasePath());
-        // Add message translation
-        if (is_dir($this->getI18nPath())) {
-            Yii::$app->getI18n()->translations[$this->getI18nCategory() . '/*'] = [
-                'class' => \yii\i18n\PhpMessageSource::class,
-                'sourceLanguage' => Yii::$app->sourceLanguage,
-                'basePath' => $this->getI18nPath(),
-            ];
+        if (empty($config['baseNamespace']) && $class->inNamespace()) {
+            $config['baseNamespace'] = $class->getNamespaceName();
+        } else {
+            $config['baseNamespace'] = trim($config['baseNamespace'], '\\');
         }
+        if (empty($config['basePath']) && $class->getFileName() !== false) {
+            // `/module-package/src/Module.php` > `/module-package`
+            $config['basePath'] = dirname($class->getFileName(), 2);
+        } else {
+            $config['basePath'] = rtrim($config['basePath'], '\/');
+        }
+        if (empty($config['controllerPath'])) {
+            $config['controllerPath'] = $config['basePath'] . DIRECTORY_SEPARATOR . static::SOURCE_DIR
+                . (Yii::$app instanceof \yii\web\Application ? '' :  DIRECTORY_SEPARATOR . 'console')
+                . DIRECTORY_SEPARATOR . 'controllers';
+        }
+        if (empty($config['controllerNamespace'])) {
+            $isWebApp = Yii::$app instanceof \yii\web\Application;
+            $config['controllerNamespace'] = $config['baseNamespace'] . ($isWebApp ? '' : '\console') . '\controllers';
+        }
+
+        parent::__construct($id, $parent, $config);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        // Add the alias for base directory of this module
+        $this->setAliases([
+            '@' . $this->getUniqueId() => $this->getBasePath()
+        ]);
+        // Add message translation
+        $i18nPath = $this->getBasePath() . DIRECTORY_SEPARATOR . static::I18N_DIR;
+        if (is_dir($i18nPath)) {
+            Yii::$app->getI18n()->translations[$this->getUniqueId()] = [
+                'class' => \yii\i18n\PhpMessageSource::class,
+                'sourceLanguage' => Yii::$app->sourceLanguage,
+                'basePath' => $i18nPath,
+            ];
+            Yii::$app->getI18n()->translations[$this->getUniqueId() . '/*'] = [
+                'class' => \yii\i18n\PhpMessageSource::class,
+                'sourceLanguage' => Yii::$app->sourceLanguage,
+                'basePath' => $i18nPath,
+            ];
+        }
+
+        // Trigger 'init' event
+        $this->trigger(static::EVENT_INIT);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function getUniqueId()
     {
@@ -64,7 +117,7 @@ abstract class Module extends \yii\base\Module
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getControllerPath()
     {
@@ -76,37 +129,57 @@ abstract class Module extends \yii\base\Module
     }
 
     /**
-     * Returns the root directory of module translations.
+     * Sets the root directory of module controllers.
+     *
+     * @param string $path The root directory of module controllers
+     * @return void
+     */
+    public function setControllerPath($path)
+    {
+        $path = Yii::getAlias(rtrim($path, '\/'));
+        $this->controllerPath = $path;
+    }
+
+    /**
+     * Returns the base directory of sources.
+     *
+     * @return string
+     */
+    public function getSourcePath()
+    {
+        return $this->getBasePath() . DIRECTORY_SEPARATOR . static::SOURCE_DIR;
+    }
+
+    /**
+     * Returns the base directory of translations.
      *
      * @return string
      */
     public function getI18nPath()
     {
-        return $this->getBasePath() . DIRECTORY_SEPARATOR . 'messages';
+        return $this->getBasePath() . DIRECTORY_SEPARATOR . static::I18N_DIR;
     }
 
     /**
-     * Returns the base category of module translations.
+     * Returns the name of Composer package detecting by `composer.json`.
      *
-     * @return string
+     * @return string|null
      */
-    public function getI18nCategory()
+    protected function getComposerPackage()
     {
-        if ($this->i18nCategory === null) {
-            $this->i18nCategory = str_replace('-', '/', $this->getUniqueId());
+        $file = $this->getBasePath() . DIRECTORY_SEPARATOR . 'composer.json';
+        \EnsoStudio\Yii2App\Helpers\Json::encode();
+        return str_replace('\\', '/', ;
+        \Composer\InstalledVersions::getVersion('vendor/package')
+    }
+
+    protected function defaultVersion()
+    {
+        $vendorPath = Yii::$app->getVendorPath();
+        if (str_starts_with($this->getBasePath(), $vendorPath)) {
+
         }
-
-        return $this->i18nCategory;
-    }
-
-    /**
-     * Returns the alias for base directory of this module.
-     *
-     * @return string
-     */
-    public function getBaseAlias()
-    {
-        return '@app/modules/' . $this->getUniqueId();
+        \Composer\InstalledVersions::getVersion('vendor/package')
     }
 
     /**
@@ -114,23 +187,14 @@ abstract class Module extends \yii\base\Module
      *
      * @param string $message the module message
      * @param array $params the message parameters
-     * @param string $subCategory the message sub-category
+     * @param string|null $subCategory the message sub-category
      * @param string|null $language the language name
      * @return string
      * @see Yii::t()
      */
-    public function i18n($message, array $params = [], $subCategory = 'common', $language = null)
+    public function translate($message, array $params = [], $subCategory = null, $language = null)
     {
-        return Yii::t($this->getI18nCategory() . '/' . $subCategory, $message, $params, $language);
-    }
-
-    /**
-     * Returns reflection instance for this class.
-     *
-     * @return ReflectionObject
-     */
-    protected function getReflection(): ReflectionObject
-    {
-        return new ReflectionObject($this);
+        $category = $this->getUniqueId() . (empty($subCategory) ? '' : '/' . $subCategory);
+        return Yii::t($category, $message, $params, $language);
     }
 }

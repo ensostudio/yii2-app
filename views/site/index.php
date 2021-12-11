@@ -1,21 +1,24 @@
 <?php
 
 /**
- * @var \yii\web\View $this
+ * @var yii\web\View $this
  */
 
+use app\models\CarMark;
+use yii\bootstrap5\ActiveForm;
+
+$markModel = CarMark::findOne(2);
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
 
-    <div class="jumbotron text-center bg-transparent">
-        <h1 class="display-4">Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
+    <?php $form = ActiveForm::begin(); ?>
+        <?= $form->field($markModel, 'name')->textInput() ?>
+        <?= $form->field($markModel, 'id')->switchInput(); ?>
+        <?= $form->field($markModel, 'logo')->colorInput(['class' => 'form-control']); ?>
+        <?= $form->field($markModel, 'id')->rangeInput(['min' => 0, 'max' => 100]); ?>
+    <?php ActiveForm::end(); ?>
+    <p>fieldClass <?= $form->fieldClass ?></p>
     <div class="body-content">
 
         <div class="row">

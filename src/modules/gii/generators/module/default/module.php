@@ -1,10 +1,10 @@
 <?php
 /**
  * This is the template for generating a module class file.
+ *
+ * @var \yii\web\View $this
+ * @var \app\gii\generators\module\Generator $generator
  */
-
-/* @var $this yii\web\View */
-/* @var $generator yii\gii\generators\module\Generator */
 
 $className = $generator->moduleClass;
 $pos = strrpos($className, '\\');
@@ -17,22 +17,21 @@ echo "<?php\n";
 namespace <?= $ns ?>;
 
 /**
- * <?= $generator->moduleID ?> module definition class
+ * Application module "<?= $generator->moduleID ?>".
  */
-class <?= $className ?> extends \yii\base\Module
+class <?= $className ?> extends \app\Module
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public $controllerNamespace = '<?= $generator->getControllerNamespace() ?>';
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
-
         // custom initialization code goes here
     }
 }
