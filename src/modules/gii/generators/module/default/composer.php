@@ -1,21 +1,20 @@
 <?php
 /**
  * @var yii\web\View $this
- * @var app\modules\gii\generators\module\Generator $generator
+ * @var app\modules\gii\generators\module\ModuleGenerator $generator
  */
 ?>
 {
     "name": "<?= $generator->composerPackage ?>",
-    "type": "yii2-module",
-    "description": "",
+    "type": "yii2-extension",
+    "description": "Application module",
     "keywords": ["yii2", "module"],
     "license": "BSD-3-Clause",
     "require": {
-        "yiisoft/yii2": "^2.0",
-        "ensostudio/yii2-common": "^1.0"
-    }
+        "php": "^7.3 | ^8.0",
+        "yiisoft/yii2": "^2.0.44"
+    },
     "require-dev": {
-        "phpunit/phpunit": ">=7.0",
         "roave/security-advisories": "dev-latest"
     },
     "autoload": {
@@ -28,19 +27,11 @@
             "<?= $generator->moduleNamespace ?>\\": "tests/"
         }
     },
+<?php if (is_subclass_of($generator->baseClass, yii\base\BootstrapInterface::class)) : ?>
     "extra": {
-        "module-config": {
-            "class": "<?= $generator->moduleClass ?>",
-            "id": "<?= $generator->moduleId ?>",
-            "basePath": "@vendor/<?= $generator->composerPackage ?>",
-            "controllerNamespace": "<?= $generator->getControllerNamespace() ?>",
-            "params": {},
-            "aliases": {
-                "@<?= $generator->composerPackage ?>": "@vendor/<?= $generator->composerPackage ?>",
-                "@<?= $generator->composerPackage ?>/controllers": "@vendor/<?= $generator->composerPackage ?>/src/controllers"
-            }
-        }
+        "bootstrap": "<?= $generator->moduleClass ?>"
     },
+<?php endif; ?>
     "repositories": [
         {
             "type": "composer",

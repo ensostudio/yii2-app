@@ -6,60 +6,70 @@ use Yii;
 use yii\base\Model;
 
 /**
- * ContactForm is the model behind the contact form.
+ * The model behind the contact form.
  */
 class ContactForm extends Model
 {
-    public $name;
-    public $email;
-    public $subject;
-    public $body;
-    public $verifyCode;
-
+    /**
+     * @var string
+     */
+    public string $subject;
+    /**
+     * @var string
+     */
+    public string $body;
+    /**
+     * @var string
+     */
+    public string $fromEmail;
+    /**
+     * @var string
+     */
+    public string $verifyCode;
 
     /**
-     * @return array the validation rules.
+     * @inheritDoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            // name, email, subject and body are required
-            [['name', 'email', 'subject', 'body'], 'required'],
-            // email has to be a valid email address
-            ['email', 'email'],
-            // verifyCode needs to be entered correctly
+            [['verifyCode', 'email', 'subject', 'body'], 'required'],
             ['verifyCode', 'captcha'],
+            ['fromEmail', 'email'],
+            [['subject', 'body'], 'string'],
         ];
     }
 
     /**
-     * @return array customized attribute labels
+     * @inheritDoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'verifyCode' => 'Verification Code',
+            'subject' => 'Subject',
+            'body' => 'Message',
+            'fromEmail' => 'Your e-mail',
+            'verifyCode' => 'Verification code',
         ];
     }
 
     /**
-     * Sends an email to the specified email address using the information collected by this model.
-     * @param string $email the target email address
+     * Sends the message to the specified e-mail address using the information collected by this form.
+     *
      * @return bool whether the model passes validation
      */
-    public function contact($email)
+    public function sendMail(): bool
     {
         if ($this->validate()) {
-            Yii::$app->mailer->compose()
-                ->setTo($email)
-                ->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']])
-                ->setReplyTo([$this->email => $this->name])
+            return Yii::$app->mailer
+                ->compose()
+                ->setTo(Yii::$app->params['adminEmail'])
+                ->setFrom($this->fromEmail)
                 ->setSubject($this->subject)
                 ->setTextBody($this->body)
                 ->send();
-
-            return true;
         }
+
         return false;
     }
 }

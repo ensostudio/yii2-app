@@ -1,27 +1,19 @@
 # IDE project files
-/.idea/
-/.buildpath/
-/.project/
-/.settings/
-/nbproject/
-
-# Windows thumbnail cache
+.idea/
+.buildpath/
+.project/
+.settings/
+build/
+nbproject/
+# OS cache
 Thumbs.db
-# Mac files
 .DS_Store
-
 # Composer vendor directory
-/vendor/*
-
-# PhpUnit configuration
-/phpunit.xml
-
-/tests/_output/*
-/tests/_support/_generated/*
-/runtime/*/*
-/*.lock
-/*.cache
-/*.tmp
-/*.phar
-# todo: убрать migrations
-/src/migrations/*
+vendor/
+# Application
+*.lock
+*.cache
+*.tmp
+*.temp
+*.phar
+*.log

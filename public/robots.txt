@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /backend/
-
+Disallow: /account/
 Sitemap: /sitemap.xml

@@ -1,13 +1,12 @@
 #!/usr/bin/env php
 <?php
+defined('YII_DEBUG') || define('YII_DEBUG', true);
+defined('YII_ENV') || define('YII_ENV', 'dev');
 
-defined('YII_DEBUG') or define('YII_DEBUG', getenv('YII_DEBUG') ?: false);
-defined('YII_ENV') or define('YII_ENV', getenv('YII_ENV') ?: 'prod');
+$appDir = __DIR__;
 
-$baseDir = __DIR__ . DIRECTORY_SEPARATOR;
-/** @var Composer\Autoload\ClassLoader $composerAutoload */
-$composerAutoload = require $baseDir . 'vendor/autoload.php';
-require $baseDir . 'vendor/yiisoft/yii2/Yii.php';
+require($appDir . '/vendor/yiisoft/yii2/Yii.php');
+require($appDir . '/vendor/autoload.php');
 
-$application = new yii\console\Application(require $baseDir . 'config/console.php');
+$application = new yii\console\Application(require($appDir . '/config/console.php'));
 exit($application->run());

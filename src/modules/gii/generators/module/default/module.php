@@ -1,37 +1,33 @@
 <?php
-/**
- * This is the template for generating a module class file.
- *
- * @var \yii\web\View $this
- * @var \app\gii\generators\module\Generator $generator
- */
 
-$className = $generator->moduleClass;
-$pos = strrpos($className, '\\');
-$ns = ltrim(substr($className, 0, $pos), '\\');
-$className = substr($className, $pos + 1);
+/**
+ * @var yii\web\View $this
+ * @var app\modules\gii\generators\module\ModuleGenerator $generator
+ */
+use yii\helpers\StringHelper;
 
 echo "<?php\n";
 ?>
 
-namespace <?= $ns ?>;
+namespace <?= $generator->moduleNamespace ?>;
 
 /**
  * Application module "<?= $generator->moduleID ?>".
+ *
+ * @inheritDoc
  */
-class <?= $className ?> extends \app\Module
+class <?= StringHelper::basename($generator->moduleClass) ?> extends \<?= $generator->baseClass . "\n" ?>
 {
     /**
      * @inheritDoc
      */
-    public $controllerNamespace = '<?= $generator->getControllerNamespace() ?>';
-
+    public $id = '<?= $generator->moduleID ?>';
     /**
      * @inheritDoc
      */
-    public function init(): void
-    {
-        parent::init();
-        // custom initialization code goes here
-    }
+    public $controllerNamespace = __NAMESPACE__;
+    /**
+     * @inheritDoc
+     */
+    public $params = [];
 }

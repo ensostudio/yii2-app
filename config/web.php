@@ -4,17 +4,37 @@ $config = [
     'id' => 'web',
     'name' => 'Yii2 application',
     'language' => 'en-US',
-    'basePath' => dirname(__DIR__),
+    'basePath' => $appDir,
     'controllerNamespace' => 'app\controllers',
+    'controllerPath' => $appDir . '/src/controllers',
+    'layout' => 'frontend',
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
-        '@app/controllers' => '@app/src/controllers',
     ],
-    'components' => require __DIR__ . '/components.php',
-    'params' => require __DIR__ . '/params.php',
-    'modules' => require __DIR__ . '/modules.php',
+    'components' => array_merge(
+        require(__DIR__ . '/components.php'),
+        [
+            'cache' => [
+                'class' => yii\caching\FileCache::class,
+                'keyPrefix' => 'frontend',
+                'gcProbability' => 1000
+            ],
+            'request' => [
+                'cookieValidationKey' => 'k2aVT7nIv4QOrfhMY5yFu5c2h5NFWgxY',
+            ],
+            'user' => [
+                'identityClass' => app\models\User::class,
+                'enableAutoLogin' => true,
+            ],
+            'errorHandler' => [
+                'errorAction' => 'site/error',
+            ],
+        ]
+    ),
+    'params' => require(__DIR__ . '/params.php'),
+    'modules' => require(__DIR__ . '/modules.php'),
     'controllerMap' => [],
     'container' => [
         'definitions' => [
@@ -30,18 +50,16 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => yii\debug\Module::class,
-        // uncomment the following to add your IP if you are not connecting from localhost.
-        // 'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => yii\gii\Module::class,
-        // uncomment the following to add your IP if you are not connecting from localhost.
-        // 'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['127.0.0.1', '::1'],
         'generators' => [
             'module' => [
-                'class' => app\modules\gii\generators\module\Generator::class,
+                'class' => app\modules\gii\generators\module\ModuleGenerator::class,
                 'templates' => [
                     'default' => '@app/modules/gii/generators/module/default',
                 ]

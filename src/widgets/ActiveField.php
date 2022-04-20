@@ -3,7 +3,6 @@
 namespace app\widgets;
 
 use yii\bootstrap5\ActiveForm;
-
 use yii\bootstrap5\Html;
 use yii\validators\NumberValidator;
 use yii\validators\RangeValidator;
@@ -17,15 +16,13 @@ class ActiveField extends \yii\bootstrap5\ActiveField
     /**
      * @var string the template for custom checkbox (switch) in default layout
      */
-    public $switchTemplate = "<div class=\"form-check form-switch\">\n{input}\n{label}\n{error}\n{hint}\n</div>";
+    public string $switchTemplate = "<div class=\"form-check form-switch\">\n{input}\n{label}\n{error}\n{hint}\n</div>";
     /**
      * @var string the template for custom checkbox (switch) in horizontal layout
      */
-    public $switchHorizontalTemplate = "{beginWrapper}\n"
+    public string $switchHorizontalTemplate = "{beginWrapper}\n"
         . "<div class=\"form-check form-switch\">\n{input}\n{label}\n{error}\n{hint}\n</div>\n"
-        . "{endWrapper}";
-
-    
+        . '{endWrapper}';
 
     /**
      * Renders a switch (custom checkbox).

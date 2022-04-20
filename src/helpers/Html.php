@@ -2,18 +2,16 @@
 
 namespace app\helpers;
 
-use yii\bootstrap5\BaseHtml;
-
 /**
  * @inheritDoc
  */
-class Html extends BaseHtml
+class Html extends \yii\bootstrap5\Html
 {
     /**
      * @inheritDoc
      * @param bool $prepend Whether to prepend given class(es)
      */
-    public static function addCssClass(&$options, $class, $prepend = false)
+    public static function addCssClass(&$options, $class, bool $prepend = false): void
     {
         $addClasses = static::parseCssClasses($class);
         if (isset($options['class'])) {

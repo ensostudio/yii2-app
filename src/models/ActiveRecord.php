@@ -26,9 +26,9 @@ abstract class ActiveRecord extends \yii\db\ActiveRecord
     public const SCENARIO_PUBLIC = 'public';
 
     /**
-     * @var string|null The name of HTML form
+     * @var string The name of HTML form
      */
-    protected $formName;
+    protected string $formName;
 
     /**
      * @inheritDoc
@@ -85,7 +85,7 @@ abstract class ActiveRecord extends \yii\db\ActiveRecord
      */
     public function formName(): string
     {
-        if ($this->formName === null) {
+        if (!$this->formName) {
             $this->formName = Inflector::underscore(parent::formName());
         }
         return $this->formName;
@@ -115,7 +115,7 @@ abstract class ActiveRecord extends \yii\db\ActiveRecord
     /**
      * Attribute type cast: timestamp.
      *
-     * @param string|int|DateTimeInterface|null $value
+     * @param string|int|float|DateTimeInterface|null $value
      * @return int
      */
     protected function attributeCastTimestamp($value): int
@@ -139,7 +139,6 @@ abstract class ActiveRecord extends \yii\db\ActiveRecord
         $behaviors = parent::behaviors();
         $behaviors['attributeTypeCast'] = [
             'class' => AttributeTypecastBehavior::class,
-            // 'typecastAfterValidate' => false,
             'typecastBeforeSave' => true,
             'typecastAfterFind' => true,
             'attributeTypes' => $this->attributeTypes(),
@@ -168,7 +167,7 @@ abstract class ActiveRecord extends \yii\db\ActiveRecord
     /**
      * @inheritDoc
      */
-    public function __isset($name)
+    public function __isset($name): bool
     {
         $normalizedName = $this->normalizeAttributeName($name);
         if ($normalizedName !== $name) {

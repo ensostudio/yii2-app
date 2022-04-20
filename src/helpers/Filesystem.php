@@ -1,24 +1,31 @@
 <?php
 
-namespace ensostudio\helpers;
+namespace app\helpers;
 
-use yii\helpers\BaseFileHelper;
+use yii\helpers\FileHelper;
 use Yii;
 
+use function is_array;
+use function str_replace;
+use function strlen;
+use function substr;
+use function strncmp;
+use function uksort;
+
 /**
- * @inheritDoc
+ * Extended `FileHelper` with supporting path aliases.
  */
-class Filesystem extends BaseFileHelper
+class Filesystem extends FileHelper
 {
     /**
-     * @var string[]|null An array of path aliases as path/alias pairs
+     * @var string[] An array of path aliases as path/alias pairs
      */
-    protected static $aliases;
+    protected static array $aliases;
 
     /**
      * @inheritDoc
      */
-    public static function normalizePath($path, $ds = DIRECTORY_SEPARATOR)
+    public static function normalizePath($path, $ds = DIRECTORY_SEPARATOR): string
     {
         return parent::normalizePath(Yii::getAlias($path), $ds);
     }
@@ -26,7 +33,7 @@ class Filesystem extends BaseFileHelper
     /**
      * @inheritDoc
      */
-    public static function copyDirectory($src, $dst, $options = [])
+    public static function copyDirectory($src, $dst, $options = []): void
     {
         parent::copyDirectory(Yii::getAlias($src), Yii::getAlias($dst), $options);
     }
@@ -34,7 +41,7 @@ class Filesystem extends BaseFileHelper
     /**
      * @inheritDoc
      */
-    public static function removeDirectory($dir, $options = [])
+    public static function removeDirectory($dir, $options = []): void
     {
         parent::removeDirectory(Yii::getAlias($dir), $options);
     }
@@ -42,7 +49,7 @@ class Filesystem extends BaseFileHelper
     /**
      * @inheritDoc
      */
-    public static function unlink($path)
+    public static function unlink($path): void
     {
         parent::unlink(Yii::getAlias($path));
     }
@@ -50,16 +57,16 @@ class Filesystem extends BaseFileHelper
     /**
      * @inheritDoc
      */
-    public static function createDirectory($path, $mode = 0775, $recursive = true)
+    public static function createDirectory($path, $mode = 0775, $recursive = true): bool
     {
         return parent::createDirectory(Yii::getAlias($path), $mode, $recursive);
     }
 
     /**
      * @inheritDoc
-     * @throws \yii\base\Exception
+     * @throws yii\base\Exception
      */
-    public static function changeOwnership($path, $ownership, $mode = null)
+    public static function changeOwnership($path, $ownership, $mode = null): void
     {
         parent::changeOwnership(Yii::getAlias($path), $ownership, $mode);
     }
@@ -83,34 +90,25 @@ class Filesystem extends BaseFileHelper
     /**
      * Returns flatten list of alias/path pairs.
      *
-     * @return array
+     * @param bool $reset the reset cache
+     * @psalm-return array<string,string|array>
      */
-    public static function getAliases(): array
+    public static function getAliases(bool $reset = false): array
     {
-        if (static::$aliases === null) {
+        if (!isset(static::$aliases) || $reset) {
             static::$aliases = [];
             /** @var string|string[] $basePaths */
             foreach (Yii::$aliases as $alias => $basePaths) {
                 if (!is_array($basePaths)) {
                     $basePaths = [$alias => $basePaths];
                 }
-                foreach ($basePaths as $alias => $basePath) {
+                foreach ($basePaths as $alias2 => $basePath) {
                     $basePath = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $basePath);
-                    static::$aliases[$basePath] = $alias;
+                    static::$aliases[$basePath] = $alias2;
                 }
             }
-            // sort by path length(long > short)
-            uksort(
-                static::$aliases,
-                /**
-                 * @param string $basePath
-                 * @param string $basePath2
-                 * @return int
-                 */
-                static function ($basePath, $basePath2) {
-                    return strlen($basePath2) - strlen($basePath);
-                }
-            );
+            // sort by path length(long > short) for `self::findAlias()`
+            uksort(static::$aliases, 'strcmp');
         }
 
         return static::$aliases;
@@ -122,7 +120,7 @@ class Filesystem extends BaseFileHelper
      * @param string $path the real path
      * @return string|false
      */
-    public static function findAlias($path)
+    public static function findAlias(string $path)
     {
         $path = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
         foreach (static::getAliases() as $basePath => $alias) {

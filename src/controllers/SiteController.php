@@ -3,8 +3,10 @@
 namespace app\controllers;
 
 use Yii;
+use Yii\captcha\CaptchaAction;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use Yii\web\ErrorAction;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
@@ -16,7 +18,7 @@ use app\models\ContactForm;
 class SiteController extends Controller
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function behaviors(): array
     {
@@ -48,11 +50,11 @@ class SiteController extends Controller
     {
         return [
             'error' => [
-                'class' => yii\web\ErrorAction::class,
+                'class' => ErrorAction::class,
             ],
             'captcha' => [
-                'class' => yii\captcha\CaptchaAction::class,
-                'fixedVerifyCode' => YII_DEBUG ? 'testme' : null,
+                'class' => CaptchaAction::class,
+                'fixedVerifyCode' => YII_ENV_PROD ? null : 'test',
             ],
         ];
     }
@@ -106,13 +108,15 @@ class SiteController extends Controller
      */
     public function actionContact()
     {
-        $model = new ContactForm();
-        if ($model->load($this->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-            return $this->refresh();
+        $form = new ContactForm();
+        if ($this->request->isPost) {
+            if ($form->load($this->request->post()) && $form->validate() && $form->sendMail()) {
+                Yii::$app->session->setFlash('contactFormSubmitted');
+                return $this->refresh();
+            }
         }
 
-        return $this->render('contact', ['model' => $model]);
+        return $this->render('contact', ['model' => $form]);
     }
 
     /**

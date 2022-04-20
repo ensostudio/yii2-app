@@ -1,6 +1,6 @@
 <?php
 
-namespace ensostudio\helpers;
+namespace app\helpers;
 
 use yii\base\Arrayable;
 use yii\helpers\BaseVarDumper;
@@ -17,17 +17,18 @@ class VarDumper extends BaseVarDumper
     /**
      * @var string The left indent for internal code
      */
-    public static $indent = '    ';
+    public static string $indent = '    ';
     /**
      * @var int The max. size of array to display in line
      */
-    public static $inlineArrayMaxSize = 3;
+    public static int $inlineArrayMaxSize = 3;
 
     /**
      * @inheritDoc
-     * @param string|null $leftOffset line offset at left as string, NULL - auto detect offset
+     * @param mixed $var the variable to export
+     * @param string|null $leftOffset the line offset at left as string, NULL - auto detect offset
      */
-    public static function export($var, $leftOffset = null)
+    public static function export($var, string $leftOffset = null): string
     {
         if ($leftOffset === null) {
             $leftOffset = static::detectLeftOffset();
@@ -40,11 +41,12 @@ class VarDumper extends BaseVarDumper
      *
      * @return string
      */
-    protected static function detectLeftOffset()
+    protected static function detectLeftOffset(): string
     {
         // calculate left offset
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
         $line = file($trace['file'])[$trace['line'] - 1];
+
         return (string) substr($line, 0, -strlen(ltrim($line)));
     }
 
@@ -56,17 +58,17 @@ class VarDumper extends BaseVarDumper
      * @param string $leftOffset line offset at left as string
      * @return string
      */
-    protected static function exportInternal($var, $level = 0, $leftOffset = '')
+    protected static function exportInternal($var, int $level = 0, string $leftOffset = ''): string
     {
         switch (gettype($var)) {
             case 'NULL':
                 $result = 'null';
                 break;
             case 'array':
-                $result .= static::exportArray($var, $leftOffset, $level);
+                $result = static::exportArray($var, $leftOffset, $level);
                 break;
             case 'object':
-                if ($var instanceof PhpCode) {
+                if ($var instanceof PhpExpression) {
                     $result = $var->__toString();
                 } elseif ($var instanceof Closure) {
                     $result = static::exportClosure($var);
@@ -103,7 +105,7 @@ class VarDumper extends BaseVarDumper
      * @param int $level the depth level
      * @return string
      */
-    public static function exportArray(array $var, $leftOffset = null, $level = 0)
+    public static function exportArray(array $var, string $leftOffset = null, int $level = 0): string
     {
         if (empty($var)) {
             return '[]';
@@ -144,7 +146,7 @@ class VarDumper extends BaseVarDumper
      * @param Closure $closure the closure instance.
      * @return string
      */
-    protected static function exportClosure(Closure $closure)
+    protected static function exportClosure(Closure $closure): string
     {
         $reflection = new ReflectionFunction($closure);
         $fileName = $reflection->getFileName();

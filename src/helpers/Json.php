@@ -1,6 +1,6 @@
 <?php
 
-namespace ensostudio\helpers;
+namespace app\helpers;
 
 use ReflectionClass;
 use JsonSerializable;
@@ -21,9 +21,9 @@ class Json extends BaseJson
      * @return string
      * @throws InvalidArgumentException [[encode()]] error
      */
-    public static function encodeObject($object, $options = 320)
+    public static function encodeObject(object $object, int $options = 320): string
     {
-        $data = static::recursiveConvertObject($object);
+        $data = static::recursiveConvertToArray($object);
 
         return static::encode($data, $options);
     }
@@ -37,7 +37,7 @@ class Json extends BaseJson
      * @throws InvalidArgumentException if decoded data is not array
      * @throws yii\base\InvalidConfigException if the configuration is invalid
      */
-    public static function decodeObject($json)
+    public static function decodeObject(string $json): object
     {
         $data = static::decode($json);
         if (!is_array($data)) {
@@ -54,7 +54,7 @@ class Json extends BaseJson
      * @return object
      * @throws yii\base\InvalidConfigException if the configuration is invalid
      */
-    protected static function recursiveConvertToObject(array $array)
+    protected static function recursiveConvertToObject(array $array): object
     {
         foreach ($array as $key => $value) {
             if (is_array($value) && isset($value['class'])) {
@@ -69,9 +69,9 @@ class Json extends BaseJson
      * Recursive converts object properties to array.
      *
      * @param object $object the object to convert
-     * @return array
+     * @return array|null
      */
-    protected static function recursiveConvertToArray($object): array
+    protected static function recursiveConvertToArray(object $object): ?array
     {
         if ($object instanceof JsonSerializable) {
             $data = $object->jsonSerialize();
@@ -100,7 +100,7 @@ class Json extends BaseJson
             $data['class'] = 'stdClass';
         }
 
-        return $config;
+        return $data;
     }
 
     /**
@@ -111,8 +111,9 @@ class Json extends BaseJson
      * @param int $options the decoding options
      * @return void
      * @throws InvalidArgumentException [[encode()]] error
+     * @throws yii\base\Exception
      */
-    public static function encodeFile($path, $data, $options = 320)
+    public static function encodeFile(string $path, $data, int $options = 320)
     {
         $path = Filesystem::normalizePath($path);
         if (!file_exists($path)) {
@@ -130,7 +131,7 @@ class Json extends BaseJson
      * @return mixed the PHP data
      * @throws InvalidArgumentException if there is any decoding error
      */
-    public static function decodeFile($path, $asArray = true)
+    public static function decodeFile(string $path, bool $asArray = true)
     {
         $path = Filesystem::normalizePath($path);
         $json = file_get_contents($path);

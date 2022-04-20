@@ -3,17 +3,23 @@
 /**
  * Application configuration shared by all test types
  */
+
 return [
     'id' => 'tests',
     'basePath' => dirname(__DIR__),
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
-        '@tests'   => '@app/tests',
+        '@tests' => '@app/tests',
     ],
     'language' => 'en-US',
     'components' => [
-        'db' => require __DIR__ . '/test_db.php',
+        [
+            'keyPrefix' => 'test',
+        ],
+        'db' => [
+            'dsn' => 'mysql:host=127.0.0.1:3306;dbname=test',
+        ],
         'mailer' => [
             'useFileTransport' => true,
         ],
@@ -34,5 +40,5 @@ return [
             */
         ],
     ],
-    'params' => require __DIR__ . '/params.php',
+    'params' => require(__DIR__ . '/params.php'),
 ];

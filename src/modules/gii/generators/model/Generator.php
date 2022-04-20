@@ -19,7 +19,6 @@ use yii\db\TableSchema;
 use yii\gii\CodeFile;
 use yii\helpers\Inflector;
 use Yii;
-
 use yii\helpers\StringHelper;
 
 use function array_flip;
@@ -33,9 +32,7 @@ use function is_subclass_of;
 use function key;
 use function lcfirst;
 use function str_replace;
-
 use function strncasecmp;
-
 use function strpos;
 
 use const PHP_INT_MAX;
@@ -45,7 +42,7 @@ use const SORT_REGULAR;
 /**
  * Extended model generator will generate `ActiveRecord` class(es) for the specified database table(s).
  *
- * @property-read \yii\db\Connection $dbConnection
+ * @property-read yii\db\Connection $dbConnection
  * @property-read string $name
  */
 class Generator extends \yii\gii\generators\model\Generator
@@ -117,31 +114,20 @@ class Generator extends \yii\gii\generators\model\Generator
     /**
      * @inheritdoc
      */
-    public function getName(): string
-    {
-        return 'Application Model Generator';
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function rules(): array
     {
-        $filter = static function (string $value): string {
-            return ltrim($value, ' \\');
-        };
         return array_merge(
             parent::rules(),
             [
                 [['modelBehaviors'], 'safe'],
-                [['baseClass', 'queryBaseClass'], 'filter', 'filter' =>  $filter]
+                [['baseClass', 'queryBaseClass'], 'trim', 'chars' => '\ ']
             ]
         );
     }
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException
+     * @throws yii\base\InvalidConfigException
      */
     public function generate(): array
     {
@@ -187,7 +173,7 @@ class Generator extends \yii\gii\generators\model\Generator
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException
+     * @throws yii\base\InvalidConfigException
      */
     public function generateTableName($tableName): string
     {
@@ -213,8 +199,11 @@ class Generator extends \yii\gii\generators\model\Generator
     {
         $data = parent::autoCompleteData();
         $data['tableColumns'] = function (): array {
-            return $this->getDbConnection()->getTableSchema($this->tableName)->getColumnNames();
+            $tableSchema = $this->getDbConnection()->getTableSchema($this->tableName);
+
+            return $tableSchema === null ? [] : $tableSchema->getColumnNames();
         };
+
         return $data;
     }
 
@@ -299,7 +288,7 @@ class Generator extends \yii\gii\generators\model\Generator
                 'updatedAtAttribute' => isset($table->columns['updated_at']) ? 'updated_at' : false,
             ];
         }
-        if (isset($table->columns['slug']) && (isset($table->columns['name']) || $table->columns['title'])) {
+        if (isset($table->columns['slug']) && (isset($table->columns['name']) || isset($table->columns['title']))) {
             $behaviors['sluggable'] = [
                 'class' => SluggableBehavior::class . '::class',
                 'attribute' => isset($table->columns['name']) ? 'name' : 'title',
@@ -337,7 +326,7 @@ class Generator extends \yii\gii\generators\model\Generator
 
     /**
      * @inheritdoc
-     * @throws \yii\base\InvalidConfigException
+     * @throws yii\base\InvalidConfigException
      */
     public function generateRules($table): array
     {
@@ -353,22 +342,22 @@ class Generator extends \yii\gii\generators\model\Generator
             if (!$column->allowNull && $column->defaultValue === null) {
                 $types['required'][] = $column->name;
             } elseif ($column->defaultValue !== null) {
-                if (strncasecmp($column->defaultValue, 'current_timestamp', 17) !== 0) {
+                if (strncasecmp((string) $column->defaultValue, 'current_timestamp', 17) !== 0) {
                     $defaults[$column->defaultValue][] = $column->name;
                 }
             } elseif ($column->allowNull) {
                 $defaults['NULL'][] = $column->name;
             }
             switch ($column->type) {
-                 case Schema::TYPE_TINYINT:
+                case Schema::TYPE_TINYINT:
                     if ($column->phpType === Schema::TYPE_TINYINT && $column->size === 1) {
                         $types['boolean'][] = $column->name;
                         break;
                     }
-                 case Schema::TYPE_SMALLINT:
-                 case Schema::TYPE_INTEGER:
-                 case Schema::TYPE_BIGINT:
-                 case 'middleint':
+                case Schema::TYPE_SMALLINT:
+                case Schema::TYPE_INTEGER:
+                case Schema::TYPE_BIGINT:
+                case 'middleint':
                     ['min' => $min, 'max' => $max] = $this->getIntegerLimits($column);
                     $rules[] = [$column->name, 'integer', 'min' => $min, 'max' => $max];
                     if ($driverName === 'pgsql') {
@@ -500,15 +489,15 @@ class Generator extends \yii\gii\generators\model\Generator
                     && is_subclass_of($queryClassRealName, BaseActiveRecord::class)
                 ) {
                     $activeQueryClass = get_class($queryClassRealName::find());
-                    if (strpos($activeQueryClass, $this->ns) === 0){
+                    if (strpos($activeQueryClass, $this->ns) === 0) {
                         $activeQueryClass = StringHelper::basename($activeQueryClass);
                     }
                     $result[$name] = $activeQueryClass;
                 } else {
-                   $result[$name] = $this->ns === $this->queryNs
+                    $result[$name] = $this->ns === $this->queryNs
                        ? $relation[1]
                        : '\\' . $this->queryNs . '\\' . $relation[1];
-                   $result[$name] .= 'Query';
+                    $result[$name] .= 'Query';
                 }
             } else {
                 $result[$name] = ActiveQuery::class;
@@ -526,8 +515,8 @@ class Generator extends \yii\gii\generators\model\Generator
      * @param array $fks obtained from the checkJunctionTable() method
      * @param array $relations table relations
      * @return array modified `$relations`
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\db\Exception
+     * @throws InvalidConfigException
+     * @throws yii\db\Exception
      */
     public function generateManyManyRelations(TableSchema $table, array $fks, array $relations): array
     {
@@ -569,7 +558,7 @@ class Generator extends \yii\gii\generators\model\Generator
                     throw new Exception('Foreign key for junction table not found.');
                 }
                 $relations[$table0Schema->fullName][$relationName] = [
-                    "return \$this->hasMany($className1::class, $link)->via('". lcfirst($foreignRelationName) . "');",
+                    "return \$this->hasMany($className1::class, $link)->via('" . lcfirst($foreignRelationName) . "');",
                     $className1,
                     true,
                 ];
@@ -597,7 +586,7 @@ class Generator extends \yii\gii\generators\model\Generator
                     throw new Exception('Foreign key for junction table not found.');
                 }
                 $relations[$table1Schema->fullName][$relationName] = [
-                    "return \$this->hasMany($className0::class, $link)->via('". lcfirst($foreignRelationName) . "');",
+                    "return \$this->hasMany($className0::class, $link)->via('" . lcfirst($foreignRelationName) . "');",
                     $className0,
                     true,
                 ];
@@ -614,11 +603,11 @@ class Generator extends \yii\gii\generators\model\Generator
     /**
      * Returns the database connection as specified by [[db]].
      *
-     * @return Connection|null
-     * @throws \yii\base\InvalidConfigException if `$this->db` is not registered
+     * @return Connection
+     * @throws InvalidConfigException if `$this->db` is not registered
      */
-    protected function getDbConnection(): ?Connection
+    protected function getDbConnection(): Connection
     {
-        return Yii::$app->get($this->db, false);
+        return Yii::$app->get($this->db);
     }
 }

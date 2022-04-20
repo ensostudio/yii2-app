@@ -2,42 +2,44 @@
 
 namespace app\assets;
 
+use yii\bootstrap5\BootstrapAsset;
 use yii\web\AssetBundle;
+use yii\web\YiiAsset;
 
 /**
- * Main application asset bundle.
+ * The assets bundle of Web application.
  */
 class AppAsset extends AssetBundle
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $sourcePath = '@app/assets';
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $basePath = '@webroot';
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $baseUrl = '@web';
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $css = [
-        'css/site.css',
+        'scss/app.scss',
     ];
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $js = [
-        'js/site.js',
+        'js/app.js',
     ];
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public $depends = [
-        \yii\web\YiiAsset::class,
-        \yii\bootstrap5\BootstrapAsset::class,
+        YiiAsset::class,
+        BootstrapAsset::class,
     ];
 }

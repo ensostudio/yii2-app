@@ -1,16 +1,17 @@
 <?php
 
 /**
- * @var \yii\web\View $this
+ * @var View $this
  * @var string $content
  */
 
 use app\assets\AppAsset;
-use app\widgets\Alert;
+use app\widgets\FlashAlertWidget;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
+use yii\web\View;
 
 AppAsset::register($this);
 ?>
@@ -57,13 +58,13 @@ AppAsset::register($this);
             ],
         ]);
         NavBar::end();
-    ?>
+        ?>
     </header>
 
     <main role="main" class="flex-shrink-0 mt-auto">
         <div class="container">
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs'] ?? []]) ?>
-            <?= Alert::widget() ?>
+            <?= FlashAlertWidget::widget() ?>
             <?= $content ?>
         </div>
     </main>

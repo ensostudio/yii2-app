@@ -1,36 +1,23 @@
 <?php
 
+/**
+ * Configuration of common application's components
+ */
+
 return [
-    'request' => [
-        'cookieValidationKey' => 'k2aVT7nIv4QOrfhMY5yFu5c2h5NFWgxY',
-    ],
     'cache' => [
         'class' => yii\caching\FileCache::class,
+        'keyPrefix' => 'cli',
+        'defaultDuration' => 86400,
+        'gcProbability' => 1000
     ],
-    'user' => [
-        'identityClass' => app\models\User::class,
-        'enableAutoLogin' => true,
-    ],
-    'errorHandler' => [
-        'errorAction' => 'site/error',
-    ],
+    'db' => require(__DIR__ . '/db.php'),
     'mailer' => [
-        'class' => yii\swiftmailer\Mailer::class,
-        'useFileTransport' => YII_ENV_DEV,
-        'enableSwiftMailerLogging' => YII_DEBUG,
-        'transport' => [
-            'class' => Swift_SmtpTransport::class,
-            // @todo configure SMTP
-            'host' => 'localhost',
-            // 'username' => 'username',
-            // 'password' => 'password',
-            // 'port' => 25,
-            // 'encryption' => 'tls',
-            'plugins' => []
-        ],
+        'class' => yii\symfonymailer\Mailer::class,
+        'useFileTransport' => YII_DEBUG,
     ],
     'log' => [
-        'traceLevel' => YII_DEBUG ? 3 : 0,
+        'traceLevel' => YII_DEBUG ? 2 : 0,
         'targets' => [
             [
                 'class' => yii\log\FileTarget::class,
@@ -38,25 +25,36 @@ return [
             ],
         ],
     ],
-    'db' => require __DIR__ . '/db.php',
     'urlManager' => [
         'enablePrettyUrl' => true,
         'showScriptName' => false,
-        'rules' => require __DIR__ . '/routes.php',
+        'rules' => [],
+    ],
+    'authManager' => [
+        'class' => yii\rbac\DbManager::class,
+    ],
+    'i18n' => [
+        'translations' => [
+            'app/*' => [
+                'class' => yii\i18n\PhpMessageSource::class,
+                'basePath' => '@app/messages',
+                'sourceLanguage' => 'en-US',
+            ],
+        ],
     ],
     'assetManager' => [
-        // override bundles to use local project files:
+        // Override bundles to use minified files in production:
         'bundles' => [
             yii\bootstrap5\BootstrapAsset::class => [
-                'sourcePath' => '@app/assets/node_modules/bootstrap/dist',
+                'sourcePath' => '@npm/bootstrap/dist',
                 'css' => [
-                    YII_DEBUG ? 'css/bootstrap.css' : 'css/bootstrap.min.css',
+                    YII_ENV_PROD ? 'css/bootstrap.min.css' : 'css/bootstrap.css',
                 ],
             ],
             yii\bootstrap5\BootstrapPluginAsset::class => [
-                'sourcePath' => '@app/assets/node_modules/bootstrap/dist',
+                'sourcePath' => '@npm/bootstrap/dist',
                 'js' => [
-                    YII_DEBUG ? 'js/bootstrap.bundle.js' : 'js/bootstrap.bundle.min.js',
+                    YII_ENV_PROD ? 'js/bootstrap.bundle.min.js' : 'js/bootstrap.bundle.js',
                 ]
             ],
         ],
