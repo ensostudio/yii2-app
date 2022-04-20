@@ -8,7 +8,7 @@ return [
     'cache' => [
         'class' => yii\caching\FileCache::class,
         'keyPrefix' => 'cli',
-        'defaultDuration' => 86400,
+        'defaultDuration' => YII_DEBUG ? 0 : 86400,
         'gcProbability' => 1000
     ],
     'db' => require(__DIR__ . '/db.php'),
@@ -17,7 +17,7 @@ return [
         'useFileTransport' => YII_DEBUG,
     ],
     'log' => [
-        'traceLevel' => YII_DEBUG ? 2 : 0,
+        'traceLevel' => YII_DEBUG ? 3 : 0,
         'targets' => [
             [
                 'class' => yii\log\FileTarget::class,
@@ -25,20 +25,25 @@ return [
             ],
         ],
     ],
+    /*
     'urlManager' => [
         'enablePrettyUrl' => true,
         'showScriptName' => false,
         'rules' => [],
     ],
+    */
     'authManager' => [
         'class' => yii\rbac\DbManager::class,
     ],
     'i18n' => [
         'translations' => [
+            'app' => [
+                'class' => yii\i18n\PhpMessageSource::class,
+                'basePath' => '@app/messages',
+            ],
             'app/*' => [
                 'class' => yii\i18n\PhpMessageSource::class,
                 'basePath' => '@app/messages',
-                'sourceLanguage' => 'en-US',
             ],
         ],
     ],
@@ -46,13 +51,13 @@ return [
         // Override bundles to use minified files in production:
         'bundles' => [
             yii\bootstrap5\BootstrapAsset::class => [
-                'sourcePath' => '@npm/bootstrap/dist',
+                'sourcePath' => '@bower/bootstrap/dist',
                 'css' => [
                     YII_ENV_PROD ? 'css/bootstrap.min.css' : 'css/bootstrap.css',
                 ],
             ],
             yii\bootstrap5\BootstrapPluginAsset::class => [
-                'sourcePath' => '@npm/bootstrap/dist',
+                'sourcePath' => '@bower/bootstrap/dist',
                 'js' => [
                     YII_ENV_PROD ? 'js/bootstrap.bundle.min.js' : 'js/bootstrap.bundle.js',
                 ]

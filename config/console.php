@@ -17,21 +17,6 @@ $config = [
     'components' => array_merge(
         require(__DIR__ . '/components.php'),
         [
-            'cache' => [
-                'class' => yii\caching\FileCache::class,
-                'keyPrefix' => 'frontend',
-                'gcProbability' => 1000
-            ],
-            'request' => [
-                'cookieValidationKey' => 'k2aVT7nIv4QOrfhMY5yFu5c2h5NFWgxY',
-            ],
-            'user' => [
-                'identityClass' => app\models\User::class,
-                'enableAutoLogin' => true,
-            ],
-            'errorHandler' => [
-                'errorAction' => 'site/error',
-            ],
         ]
     ),
     'controllerMap' => [

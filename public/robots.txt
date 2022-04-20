@@ -1,4 +1,11 @@
+# See https://en.wikipedia.org/wiki/Robots_exclusion_standard
 User-agent: *
 Disallow: /backend/
 Disallow: /account/
-Sitemap: /sitemap.xml
+
+# Full URL to XML sitemap
+# Sitemap: http://localhost/sitemap.xml
+
+# Indicates to the Yandex bot that the page URL contains parameters(UTM tags) that should be ignored
+Clean-param: utm
+

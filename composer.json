@@ -76,7 +76,10 @@
       "setPermission": [
         {
           "runtime": "0775",
+          "assets": "0775",
+          "migrations": "0775",
           "public/assets": "0775",
+          "public/backend/assets": "0775",
           "yii": "0775",
           "yii.bat": "0775"
         }
@@ -84,7 +87,8 @@
     },
     "yii\\composer\\Installer::postInstall": {
       "generateCookieValidationKey": [
-        "config/web.php"
+        "config/frontend.php",
+        "config/backend.php"
       ]
     }
   },

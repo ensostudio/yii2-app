@@ -1,25 +1,23 @@
 <?php
 
-namespace app\widgets;
+namespace app\web\widgets;
 
 use app\helpers\Html;
-use yii\bootstrap5\Widget;
+use Exception;
 use yii\bootstrap5\Alert;
+use yii\bootstrap5\Widget;
 use Yii;
 
 /**
- * Alert widget renders a message from session flash.
+ * Alert widget renders session's flash message.
  *
- * All flash messages are displayed in the sequence they were assigned using `Session::setFlash()`.
- * You can set message as following:
+ * All flash messages are displayed in the sequence they were assigned using `Session::setFlash()`:
  * ```php
  * Yii::$app->session->setFlash('error', 'This is the error message');
  * Yii::$app->session->setFlash('success', 'This is the success message');
  * ```
- * Multiple messages could be set as follows:
- * ```php
- * Yii::$app->session->setFlash('info', ['Error 1', 'Error 2']);
- * ```
+ *
+ * @see \yii\web\Session::setFlash()
  */
 class FlashAlertWidget extends Widget
 {
@@ -31,6 +29,7 @@ class FlashAlertWidget extends Widget
     public array $alertTypes = [
         'error'   => 'alert-danger',
         'danger'  => 'alert-danger',
+        'ok'      => 'alert-success',
         'success' => 'alert-success',
         'info'    => 'alert-info',
         'warning' => 'alert-warning'
@@ -38,36 +37,34 @@ class FlashAlertWidget extends Widget
     /**
      * @var array the options for rendering the close button tag
      */
-    public array $closeButton = [];
+    public array $closeButtonOptions = [];
 
     /**
      * @inheritDoc
-     * @throws \Exception The rendering error
+     * @throws Exception The rendering error
      */
     public function run(): string
     {
-        if (!Yii::$app->session->hasSessionId) {
+        $session = Yii::$app->getSession();
+        if (!$session->hasSessionId) {
             return '';
         }
 
         $result = '';
-        foreach (Yii::$app->session->getAllFlashes() as $type => $messages) {
+        foreach ($session->getAllFlashes() as $type => $messages) {
             if (!isset($this->alertTypes[$type])) {
                 continue;
             }
-            $idPrefix = $this->getId() . '-' . $type . '-';
-            foreach ((array) $messages as $i => $message) {
+            $session->removeFlash($type);
+            foreach ((array) $messages as $message) {
                 $options = $this->options;
                 Html::addCssClass($options, $this->alertTypes[$type]);
-                $options['id'] = $idPrefix . $i;
                 $result .= Alert::widget([
                     'body' => $message,
-                    'closeButton' => $this->closeButton,
+                    'closeButton' => $this->closeButtonOptions,
                     'options' => $options,
                 ]);
             }
-
-            Yii::$app->session->removeFlash($type);
         }
 
         return $result;

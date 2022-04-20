@@ -3,13 +3,13 @@
 namespace app\base;
 
 use ReflectionClass;
-use Yii;
 use yii\base\BootstrapInterface;
 use yii\base\Module;
 use yii\base\Application;
 use yii\helpers\FileHelper;
 use yii\helpers\Inflector;
 use yii\web\GroupUrlRule;
+use Yii;
 
 /**
  * Module/application trait.
@@ -23,7 +23,6 @@ use yii\web\GroupUrlRule;
  * @property-read string $baseNamespace The module namespace
  * @property-read string $sourcePath the path to base directory of sources of the module/application
  * @property-read string $i18nPath The path to the base directory of translations of the module/application
- * @property-read GroupUrlRule $urlRules The URL rules of module and sub-modules
  * @property-read string $i18nCategory The category of I18N messages
  */
 trait ModuleTrait
@@ -37,20 +36,10 @@ trait ModuleTrait
      */
     protected string $baseNamespace;
     /**
-     * @var array The URL rules to module's Web controllers
-     * @see \yii\web\UrlManager::$rules
-     */
-    protected array $urlRules = [];
-    /**
      * @var string The category of I18N messages
      */
     protected string $i18nCategory;
 
-    /**
-     * @var bool Whether to auto load sub-module classes implements `BootstrapInterface`
-     * @see self::loadBootstrapModules()
-     */
-    public bool $autoloadBootstrapModules = true;
     /**
      * @var bool Whether to auto fill controller's map
      * @see self::loadControllerMap()
@@ -80,9 +69,6 @@ trait ModuleTrait
 
         parent::__construct($id, $parent, $config);
 
-        if ($this->autoloadBootstrapModules) {
-            $this->loadBootstrapModules();
-        }
         if ($this->autoloadControllerMap && empty($this->controllerMap) && is_dir($this->getControllerPath())) {
             $this->loadControllerMap();
         }
@@ -126,29 +112,6 @@ trait ModuleTrait
             $id = str_replace('\-', '/', Inflector::camel2id(substr($class, 0, -10)));
             $this->controllerMap[$id] = $this->controllerNamespace . '\\' . $class;
         }
-    }
-
-    /**
-     * Returns the URL rules for actions of module and sub-modules.
-     *
-     * @return GroupUrlRule
-     */
-    public function getUrlRules(): GroupUrlRule
-    {
-        $rules = [];
-        $class = get_class($this);
-        foreach ($this->getModules() as $id => $module) {
-            if (is_array($module) && is_subclass_of($module['class'], $class)) {
-                $module = $this->getModule($id);
-            }
-            if ($module instanceof self) {
-                $rules[] = $module->getUrlRules();
-            }
-        }
-        return new GroupUrlRule([
-            'prefix' => $this->getUniqueId(),
-            'rules' => $rules,
-        ]);
     }
 
     /**

@@ -1,11 +1,43 @@
-# Use UTF-8 encoding for anything served `text/plain` or `text/html`
-AddDefaultCharset UTF-8
+# Use UTF-8 encoding
+AddDefaultCharset utf-8
 
 # Protect hidden files from being viewed
-<Files .*>
-  Order Deny,Allow
-  Deny From All
-</Files>
+<IfModule mod_version.c>
+  <IfVersion < 2.4>
+    <Files .*>
+      Order Deny,Allow
+      Deny From All
+    </Files>
+  </IfVersion>
+  <IfVersion >= 2.4>
+    <Files .*>
+      Require all denied
+    </Files>
+  </IfVersion>
+</IfModule>
+
+# Send CORS headers if browsers request them, enabled by default for images.
+<IfModule mod_setenvif.c>
+  <IfModule mod_headers.c>
+    <FilesMatch "\.(gif|png|jpe?g|svg|svgz|ico|webp)$">
+      SetEnvIf Origin ":" IS_CORS
+      Header set Access-Control-Allow-Origin "*" env=IS_CORS
+    </FilesMatch>
+  </IfModule>
+</IfModule>
+
+# Allow access from all domains for web fonts.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(ttf|ttc|otf|eot|woff|font.css)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>
+
+# Apache content negotation tries to interpret non-existent paths as files if MultiViews is enabled.
+# This will however cause issues with paths containg dots, e.g. for the cron tasks.
+<IfModule mod_negotiation.c>
+  Options -MultiViews
+</IfModule>
 
 # "-Indexes" will have Apache block users from browsing folders without a default document Usually you should leave this
 # activated, because you shouldn't allow everybody to surf through every folder on your server.
@@ -13,23 +45,71 @@ AddDefaultCharset UTF-8
   Options -Indexes
 </IfModule>
 
-<IfModule mod_rewrite.c>
-  # If your web host doesn't allow the FollowSymlinks option, you may need to comment it out and use
-  # SymLinksOfOwnerMatch option
-  Options +FollowSymlinks
-  # Options +SymLinksIfOwnerMatch
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresDefault                                      "access plus 1 day"
+    # CSS
+    ExpiresByType text/css                              "access plus 1 day"
+    # Data interchange
+    ExpiresByType application/atom+xml                  "access plus 1 hour"
+    ExpiresByType application/rss+xml                   "access plus 1 hour"
+    ExpiresByType application/json                      "access plus 0 seconds"
+    ExpiresByType application/xml                       "access plus 0 seconds"
+    ExpiresByType text/xml                              "access plus 0 seconds"
+    # HTML
+    ExpiresByType text/html                             "access plus 0 seconds"
+    # JavaScript
+    ExpiresByType application/javascript                "access plus 1 hour"
+    ExpiresByType text/javascript                       "access plus 1 hour"
+    # Multi-media
+    ExpiresByType audio/ogg                             "access plus 1 week"
+    ExpiresByType image/x-icon                          "access plus 1 week"
+    ExpiresByType image/bmp                             "access plus 1 week"
+    ExpiresByType image/gif                             "access plus 1 week"
+    ExpiresByType image/jpeg                            "access plus 1 week"
+    ExpiresByType image/png                             "access plus 1 week"
+    ExpiresByType image/svg+xml                         "access plus 1 week"
+    ExpiresByType image/webp                            "access plus 1 week"
+    ExpiresByType video/mp4                             "access plus 1 week"
+    ExpiresByType video/ogg                             "access plus 1 week"
+    ExpiresByType video/webm                            "access plus 1 week"
+    # Web fonts
+    ExpiresByType font/eot                              "access plus 1 month"
+    ExpiresByType font/opentype                         "access plus 1 month"
+    ExpiresByType application/x-font-ttf                "access plus 1 month"
+    ExpiresByType application/font-woff                 "access plus 1 month"
+    ExpiresByType application/x-font-woff               "access plus 1 month"
+    ExpiresByType font/woff                             "access plus 1 month"
+    ExpiresByType application/font-woff2                "access plus 1 month"
+</IfModule>
 
+<IfModule mod_rewrite.c>
   # Turning on the rewrite engine is necessary for the following rules and features.
   # FollowSymLinks must be enabled for this to work.
   RewriteEngine On
   # Some cloud hosting services require RewriteBase to be set.
   RewriteBase /
 
-  # Suppress or force the "www." at the beginning of URLs. Rewrite "www.example.com -> example.com".
-  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-  RewriteRule ^ %{HTTP_SCHEME}://%1%{REQUEST_URI} [R=301,L]
+  # If your web host doesn't allow the FollowSymlinks option, you may need to comment it out and use
+  # SymLinksOfOwnerMatch option
+  Options +FollowSymlinks
+  # Options +SymLinksIfOwnerMatch -MultiViews
 
-  # Yii web application
+  # Suppress or force the "www." at the beginning of URLs. Rewrite "www.example.com -> example.com".
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+
+  RewriteCond %{HTTPS} !=off
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+  # Yii web applications
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  # RewriteRule ^/backend/(.*)$ backend/index.php [QSA,L]
+  RewriteRule ^backend/(.*)$ backend/index.php/$1 [PT]
+
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule . index.php [L]
