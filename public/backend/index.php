@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Web application: back-end.
+ * Back-end Web application.
  */
 
 defined('YII_DEBUG') || define('YII_DEBUG', getenv('YII_DEBUG') ?: true);

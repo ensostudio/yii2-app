@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'Home' => 'Home'
+    'Home' => 'Главная'
 ];

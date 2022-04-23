@@ -3,6 +3,6 @@
 return [
     'adminEmail' => 'admin@localhost',
     'senderEmail' => 'no-reply@localhost',
-    'languages' => ['en'],
-    'defaultLanguage' => 'en',
+    'languages' => ['en' => 'English'],
+    'language' => 'en',
 ];

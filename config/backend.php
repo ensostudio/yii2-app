@@ -81,33 +81,4 @@ $config = [
     ]
 ];
 
-// Configuration adjustments for development environment
-if (YII_ENV_DEV) {
-    $config['bootstrap'][] = 'debug';
-    $config['modules']['debug'] = [
-        'class' => yii\debug\Module::class,
-        'allowedIPs' => ['127.0.0.1', '::1'],
-    ];
-
-    $config['bootstrap'][] = 'gii';
-    $config['modules']['gii'] = [
-        'class' => yii\gii\Module::class,
-        'allowedIPs' => ['127.0.0.1', '::1'],
-        'generators' => [
-            'module' => [
-                'class' => app\modules\gii\generators\module\ModuleGenerator::class,
-                'templates' => [
-                    'default' => '@app/modules/gii/generators/module/default',
-                ]
-            ],
-            'model' => [
-                'class' => app\modules\gii\generators\model\Generator::class,
-                'templates' => [
-                    'default' => '@app/modules/gii/generators/model/default',
-                ]
-            ]
-        ]
-    ];
-}
-
 return $config;

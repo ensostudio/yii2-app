@@ -8,17 +8,15 @@ return [
     'id' => 'tests',
     'basePath' => dirname(__DIR__),
     'aliases' => [
-        '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
         '@tests' => '@app/tests',
     ],
     'language' => 'en-US',
     'components' => [
-        [
+        'cache' => [
             'keyPrefix' => 'test',
         ],
         'db' => [
-            'dsn' => 'mysql:host=127.0.0.1:3306;dbname=test',
+            'dsn' => 'mysql:host=127.0.0.1:3306;dbname=yii2test',
         ],
         'mailer' => [
             'useFileTransport' => true,
@@ -29,16 +27,6 @@ return [
         'user' => [
             'identityClass' => app\models\User::class,
         ],
-        'request' => [
-            'cookieValidationKey' => 'test',
-            'enableCsrfValidation' => false,
-            // but if you absolutely need it set cookie domain to localhost
-            /*
-            'csrfCookie' => [
-                'domain' => 'localhost',
-            ],
-            */
-        ],
     ],
-    'params' => require(__DIR__ . '/params.php'),
+    'params' => [],
 ];

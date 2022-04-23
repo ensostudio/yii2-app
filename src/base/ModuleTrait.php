@@ -3,12 +3,10 @@
 namespace app\base;
 
 use ReflectionClass;
-use yii\base\BootstrapInterface;
 use yii\base\Module;
 use yii\base\Application;
 use yii\helpers\FileHelper;
 use yii\helpers\Inflector;
-use yii\web\GroupUrlRule;
 use Yii;
 
 /**
@@ -75,29 +73,7 @@ trait ModuleTrait
     }
 
     /**
-     * Loads the sub-module classes implements `BootstrapInterface`.
-     *
-     * Note: sub-module class MUST have name `*Module`, where `*` is module identifier(`Module::$id`).
-     *
-     * @return void
-     */
-    public function loadBootstrapModules()
-    {
-        foreach ($this->getModules() as $id => $module) {
-            if (
-                is_array($module)
-                && (new ReflectionClass($module['class']))->implementsInterface(BootstrapInterface::class)
-            ) {
-                $module = $this->getModule($id);
-            }
-            if ($module instanceof self) {
-                $module->loadBootstrapModules();
-            }
-        }
-    }
-
-    /**
-     * Fills `self::$controllerMap` property by files in controller's directory.
+     * Fills `controllerMap` property by files in controller's directory.
      *
      * @return void
      */
@@ -160,7 +136,9 @@ trait ModuleTrait
     public function getI18nCategory(): string
     {
         if (!isset($this->i18nCategory)) {
-            $this->i18nCategory = $this instanceof Application ? 'app/' . $this->id : 'modules/' . $this->getUniqueId();
+            $this->i18nCategory = $this instanceof Application
+                ? 'app/' . $this->id
+                : 'modules/' . $this->getUniqueId();
         }
 
         return $this->i18nCategory;

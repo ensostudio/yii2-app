@@ -2,7 +2,7 @@
 
 return [
     'class' => yii\db\Connection::class,
-    'dsn' => 'mysql:host=127.0.0.1:3306;dbname=yii2' . (YII_ENV_TEST ? 'test' : 'app'),
+    'dsn' => 'mysql:host=127.0.0.1:3306;dbname=yii2app',
     'username' => 'root',
     'password' => '',
     'charset' => 'utf8',

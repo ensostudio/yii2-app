@@ -4,9 +4,14 @@ namespace app\base;
 
 use Yii;
 use yii\base\BootstrapInterface;
-use yii\base\Module;
 use yii\i18n\PhpMessageSource;
 use yii\web\GroupUrlRule;
+
+use function array_filter;
+use function array_key_exists;
+use function is_array;
+use function is_dir;
+use function is_subclass_of;
 
 /**
  * Base application module.
@@ -14,14 +19,14 @@ use yii\web\GroupUrlRule;
  * @inheritDoc
  * @property GroupUrlRule|array $urlRules The URL rules of module and sub-modules to web controllers
  */
-abstract class BaseModule extends Module implements BootstrapInterface
+abstract class Module extends \yii\base\Module implements BootstrapInterface
 {
     use ModuleTrait;
 
     /**
      * @var GroupUrlRule The URL rules of module and sub-modules to web controllers
      */
-    protected GroupUrlRule $urlRules;
+    private GroupUrlRule $urlRules;
 
     /**
      * Sets the URL rules of module and sub-modules to web controllers.
@@ -43,8 +48,9 @@ abstract class BaseModule extends Module implements BootstrapInterface
             $group->routePrefix = $this->getUniqueId();
         }
 
-        // Adds sub-module's rules
+        // Add sub-module's rules
         foreach ($this->getModules() as $id => $module) {
+            // Skip configured module
             if (array_key_exists($id, $group->rules)) {
                 continue;
             }
@@ -84,7 +90,14 @@ abstract class BaseModule extends Module implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        $this->loadBootstrapModules();
+        foreach ($this->getModules() as $id => $module) {
+            if (is_array($module) && is_subclass_of($module['class'], BootstrapInterface::class)) {
+                $module = $this->getModule($id);
+            }
+            if ($module instanceof BootstrapInterface) {
+                $module->bootstrap($app);
+            }
+        }
 
         // Adds alias for module directory
         $this->setAliases(['@modules/' . $this->getUniqueId() => $this->getBasePath()]);

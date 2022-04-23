@@ -1,16 +1,16 @@
 <?php
 
-namespace app\gii\generators\controller;
+namespace app\modules\gii\generators\controller;
 
 /**
  * @inheritDoc
  */
-class BackendGenerator extends \yii\gii\generators\controller\Generator
+class BackendGenerator extends Generator
 {
     /**
      * @inheritDoc
      */
-    public $baseClass = app\controllers\BackendController::class;
+    public $baseClass = \app\web\BackendController::class;
 
     /**
      * @inheritDoc
@@ -27,6 +27,6 @@ class BackendGenerator extends \yii\gii\generators\controller\Generator
      */
     public function getName(): string
     {
-        return 'Back-end Controller Generator';
+        return 'Back-end controller generator';
     }
 }

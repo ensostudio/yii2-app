@@ -19,7 +19,7 @@ use Yii;
  *
  * @see \yii\web\Session::setFlash()
  */
-class FlashAlertWidget extends Widget
+class FlashAlert extends Widget
 {
     /**
      * @var array the alert types configuration for the flash messages:

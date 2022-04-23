@@ -8,7 +8,7 @@ $config = [
     'controllerNamespace' => 'app\controllers',
     'controllerPath' => $rootDir . '/src/controllers',
     'layout' => 'frontend',
-    'defaultRoute' => 'frontend/site/index',
+    'defaultRoute' => 'frontend/index',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
@@ -38,15 +38,11 @@ $config = [
                 'class' => yii\web\UrlManager::class,
                 'enablePrettyUrl' => true,
                 'showScriptName' => false,
-                'normalizer' => [
-                    'class' => yii\web\UrlNormalizer::class,
-                    'collapseSlashes' => true,
-                    'normalizeTrailingSlash' => true,
-                ],
+                'normalizer' => yii\web\UrlNormalizer::class,
                 'rules' => [
                     new yii\web\GroupUrlRule([
                         'rules' => [
-                            'site' => 'site/index',
+                            'frontend' => 'frontend/index',
                         ]
                     ])
                 ],

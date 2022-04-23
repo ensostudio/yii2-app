@@ -1,15 +1,14 @@
 <?php
-
-use yii\helpers\Inflector;
-use yii\helpers\StringHelper;
-
 /**
  * This is the template for generating a controller class file.
  * @var yii\web\View $this
- * @var yii\gii\generators\controller\Generator $generator
+ * @var app\modules\gii\generators\controller\Generator $generator
  */
+use yii\helpers\Inflector;
+use yii\helpers\StringHelper;
+
 $controllerID = $generator->getControllerID();
-$appEnv = StringHelper::basename(get_class($generator)) === 'BackendGenerator' ? 'Back-end' : 'Front-end';
+$isbackendGenerator = $generator instanceof app\modules\gii\generators\controller\BackendGenerator;
 $controllerClass = StringHelper::basename($generator->controllerClass);
 echo "<?php\n";
 ?>
@@ -17,13 +16,15 @@ echo "<?php\n";
 namespace <?= $generator->getControllerNamespace() ?>;
 
 /**
- * <?= $appEnv ?> controller <?= Inflector::humanize(lcfirst($controllerID)) ?>.
+ * <?= $isbackendGenerator ? 'Back' : 'Front' ?>-end controller "<?= str_replace(['_', '-'], ' ', $controllerID) ?>".
+ *
+ * @inheritDoc
  */
 class <?= $controllerClass ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . "\n" ?>
 {
 <?php foreach ($generator->getActionIDs() as $action): ?>
     /**
-     * Action "<?= Inflector::humanize(lcfirst($action)) ?>".
+     * Action "<?= str_replace(['_', '-'], ' ', $action) ?>".
      *
      * @return string
      */
@@ -31,6 +32,5 @@ class <?= $controllerClass ?> extends <?= '\\' . ltrim($generator->baseClass, '\
     {
         return $this->render('<?= $action ?>');
     }
-
 <?php endforeach; ?>
 }
